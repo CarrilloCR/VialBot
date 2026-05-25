@@ -481,18 +481,13 @@ function ChatScreen(){
     setLoading(true);
     try{
       const history=msgs.map(m=>({role:m.role==="assistant"?"assistant":"user",content:m.text}));
-      const res=await fetch("https://api.anthropic.com/v1/messages",{
+      const res=await fetch("http://localhost:3000/chat",{
         method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-20250514",
-          max_tokens:1000,
-          system:SYSTEM,
-          messages:[...history,{role:"user",content:t}],
-        }),
+        body:JSON.stringify({message:t,history}),
       });
       const data=await res.json();
-      const reply=data.content?.[0]?.text||"Lo siento, tuve un error técnico. ¿Podés intentarlo de nuevo?";
+      const reply=data.reply||"Lo siento, tuve un error técnico. ¿Podés intentarlo de nuevo?";
       setMsgs(p=>[...p,{role:"assistant",text:reply}]);
     }catch{
       setMsgs(p=>[...p,{role:"assistant",text:"Mmm, tuve un problema técnico 😅. ¿Podés intentar de nuevo?"}]);
